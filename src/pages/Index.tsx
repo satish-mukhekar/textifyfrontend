@@ -9,6 +9,7 @@ import { Message } from '@/lib/types';
 import { sendMessage, generateId } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import jsPDF from 'jspdf';
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -56,31 +57,63 @@ const Index = () => {
 
   const exportChat = () => {
     try {
-      // Format the messages for export
-      const chatContent = messages.map(msg => {
+      // Create a new PDF document
+      const doc = new jsPDF();
+      const lineHeight = 10;
+      let y = 20; // Start position
+      
+      // Add title
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Chat Conversation Export', 20, y);
+      y += lineHeight * 2;
+      
+      // Reset to normal text
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      
+      // Format and add messages
+      messages.forEach((msg, index) => {
         const role = msg.role === 'user' ? 'You' : 'Donatuz AI';
         const time = msg.timestamp ? new Date(msg.timestamp).toLocaleString() : '';
-        return `${role} (${time}):\n${msg.content}\n\n`;
-      }).join('');
+        
+        // Add the role and timestamp
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${role} (${time}):`, 20, y);
+        y += lineHeight;
+        
+        // Add the message content
+        doc.setFont('helvetica', 'normal');
+        
+        // Handle long content with line wrapping
+        const splitText = doc.splitTextToSize(msg.content, 170);
+        
+        // Check if we need a new page
+        if (y + (splitText.length * lineHeight) > 280) {
+          doc.addPage();
+          y = 20;
+        }
+        
+        doc.text(splitText, 20, y);
+        y += (splitText.length * lineHeight) + 10;
+        
+        // Add more space after each message
+        if (index < messages.length - 1) {
+          // Check if we need a new page for the next message
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+        }
+      });
       
-      // Create file
-      const blob = new Blob([chatContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
+      // Save the PDF
+      const filename = `chat-export-${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(filename);
       
-      // Create download link
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `chat-export-${new Date().toISOString().split('T')[0]}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      
-      // Clean up
-      URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success('Chat exported successfully!');
+      toast.success('Chat exported as PDF successfully!');
     } catch (error) {
-      toast.error('Failed to export chat');
+      toast.error('Failed to export chat as PDF');
       console.error('Export error:', error);
     }
   };
