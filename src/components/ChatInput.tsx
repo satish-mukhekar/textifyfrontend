@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Sparkles } from 'lucide-react';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -46,16 +46,17 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
       onSubmit={handleSubmit} 
       className="flex items-end gap-2 w-full"
     >
-      <div className="relative flex-grow glass-panel rounded-2xl overflow-hidden">
+      <div className="relative flex-grow rounded-2xl overflow-hidden border border-input bg-background shadow-sm">
+        <Sparkles className="absolute left-3 top-1/2 -translate, left-3, top-1/2, -translate-y-1/2 text-muted-foreground h-4 w-4" style={{ opacity: input ? 0 : 0.5 }} />
         <textarea
           ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type your message..."
+          placeholder="Message ChatGPT..."
           rows={1}
           disabled={isLoading}
-          className="w-full px-4 py-3 pr-12 resize-none focus:outline-none bg-transparent placeholder:text-muted-foreground/70"
+          className="w-full px-4 py-3 pl-10 pr-12 resize-none focus:outline-none bg-transparent placeholder:text-muted-foreground/70"
           style={{ minHeight: '44px', maxHeight: '200px' }}
         />
       </div>

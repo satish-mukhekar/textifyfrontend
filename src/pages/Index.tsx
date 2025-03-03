@@ -13,7 +13,7 @@ const Index = () => {
     {
       id: 'welcome',
       role: 'assistant',
-      content: 'Hello! How can I assist you today?',
+      content: 'Hello! I\'m ChatGPT, a large language model trained by OpenAI. How can I assist you today?',
       timestamp: Date.now()
     }
   ]);
@@ -58,19 +58,22 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-[100dvh] max-w-4xl mx-auto px-4">
+    <div className="flex flex-col min-h-[100dvh] bg-gradient-to-b from-background to-background/95">
       <Header />
       
-      <main className="flex-1 flex flex-col w-full max-w-3xl mx-auto mb-4">
+      <main className="flex-1 flex flex-col w-full max-w-3xl mx-auto mb-4 px-4">
         {/* Messages container */}
-        <div className="flex-1 overflow-y-auto py-4 px-2">
-          <div className="space-y-4 pb-4">
+        <div className="flex-1 overflow-y-auto py-6 px-2">
+          <div className="space-y-2 pb-4">
             {messages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
             
             {isLoading && (
-              <div className="flex justify-start my-4">
+              <div className="flex justify-start my-4 items-start gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                  <div className="h-4 w-4" />
+                </div>
                 <div className="ai-message flex items-center space-x-2">
                   <LoadingDots className="text-current" />
                 </div>
@@ -83,7 +86,7 @@ const Index = () => {
         </div>
         
         {/* Input area */}
-        <div className="sticky bottom-0 w-full glass-panel rounded-t-2xl px-4 py-3 border-t">
+        <div className="sticky bottom-0 w-full glass-panel rounded-t-2xl px-4 py-4 border-t bg-background/80 backdrop-blur-sm">
           <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
         </div>
       </main>
