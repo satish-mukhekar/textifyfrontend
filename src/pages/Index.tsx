@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
@@ -6,6 +7,8 @@ import ChatInput from '@/components/ChatInput';
 import LoadingDots from '@/components/LoadingDots';
 import { Message } from '@/lib/types';
 import { sendMessage, generateId } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -51,6 +54,37 @@ const Index = () => {
     }
   };
 
+  const exportChat = () => {
+    try {
+      // Format the messages for export
+      const chatContent = messages.map(msg => {
+        const role = msg.role === 'user' ? 'You' : 'Donatuz AI';
+        const time = msg.timestamp ? new Date(msg.timestamp).toLocaleString() : '';
+        return `${role} (${time}):\n${msg.content}\n\n`;
+      }).join('');
+      
+      // Create file
+      const blob = new Blob([chatContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      
+      // Create download link
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chat-export-${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('Chat exported successfully!');
+    } catch (error) {
+      toast.error('Failed to export chat');
+      console.error('Export error:', error);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-[100dvh] bg-gradient-to-b from-background to-background/95">
       <Header />
@@ -58,6 +92,19 @@ const Index = () => {
       <main className="flex-1 flex flex-col w-full max-w-3xl mx-auto mb-4 px-4">
         <div className="flex-1 overflow-y-auto py-6 px-2">
           <div className="space-y-2 pb-4">
+            <div className="flex justify-end mb-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs flex items-center gap-1" 
+                onClick={exportChat}
+                disabled={messages.length <= 1}
+              >
+                <Download size={14} />
+                Export Chat
+              </Button>
+            </div>
+            
             {messages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
