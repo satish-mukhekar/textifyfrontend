@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
@@ -13,14 +12,13 @@ const Index = () => {
     {
       id: 'welcome',
       role: 'assistant',
-      content: 'Hello! I\'m ChatGPT, a large language model trained by OpenAI. How can I assist you today?',
+      content: 'Hello! I\'m Donatuz AI, powered by 0g.ai. How can I assist you today?',
       timestamp: Date.now()
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to the bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -32,7 +30,6 @@ const Index = () => {
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
 
-    // Add user message to the chat
     const userMessage: Message = {
       id: generateId(),
       role: 'user',
@@ -44,10 +41,7 @@ const Index = () => {
     setIsLoading(true);
 
     try {
-      // In a real app, this would send all context messages for better responses
       const aiMessage = await sendMessage([...messages, userMessage]);
-      
-      // Add AI response to the chat
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to get response');
@@ -62,7 +56,6 @@ const Index = () => {
       <Header />
       
       <main className="flex-1 flex flex-col w-full max-w-3xl mx-auto mb-4 px-4">
-        {/* Messages container */}
         <div className="flex-1 overflow-y-auto py-6 px-2">
           <div className="space-y-2 pb-4">
             {messages.map((message) => (
@@ -80,12 +73,10 @@ const Index = () => {
               </div>
             )}
             
-            {/* Invisible element to scroll to */}
             <div ref={messagesEndRef} />
           </div>
         </div>
         
-        {/* Input area */}
         <div className="sticky bottom-0 w-full glass-panel rounded-t-2xl px-4 py-4 border-t bg-background/80 backdrop-blur-sm">
           <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
         </div>
