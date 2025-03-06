@@ -46,7 +46,7 @@ const Index = () => {
   
     try {
       // Call your API
-      const response = await fetch('http://localhost:5000/api/inference/request', {
+      const response = await fetch('https://og-aibotbackend-git-main-satishmukhekars-projects.vercel.app/api/inference/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
