@@ -8,7 +8,7 @@ import LoadingDots from '@/components/LoadingDots';
 import { Message } from '@/lib/types';
 import { sendMessage, generateId } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Bot, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 
 const Index = () => {
@@ -33,27 +33,53 @@ const Index = () => {
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
-
+  
     const userMessage: Message = {
       id: generateId(),
       role: 'user',
       content,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-
+  
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
-
+  
     try {
-      const aiMessage = await sendMessage([...messages, userMessage]);
+      // Call your API
+      const response = await fetch('http://localhost:5000/api/inference/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          providerAddress: '0xf07240Efa67755B5311bc75784a061eDB47165Dd',
+          content,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch response');
+      }
+  
+      const data = await response.json();
+  
+      // AI message from API response
+      const aiMessage: Message = {
+        id: generateId(),
+        role: 'assistant',
+        content: data.content, // Setting API response as message content
+        timestamp: Date.now(),
+      };
+  
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to get response');
       console.error('Error getting AI response:', error);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading only after API response is received
     }
   };
+  
 
   const exportChat = () => {
     try {
@@ -145,10 +171,13 @@ const Index = () => {
             {isLoading && (
               <div className="flex justify-start my-4 items-start gap-3">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                  <div className="h-4 w-4" />
+                  <Bot size={18} className="text-secondary-foreground" />
                 </div>
-                <div className="ai-message flex items-center space-x-2">
-                  <LoadingDots className="text-current" />
+                <div className="ai-message max-w-[80%] md:max-w-[70%] relative p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <span className="mr-2">Thinking</span>
+                    <LoadingDots className="text-current" />
+                  </div>
                 </div>
               </div>
             )}
