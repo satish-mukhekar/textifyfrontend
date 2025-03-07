@@ -60,7 +60,7 @@ const Index = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch response');
       }
-  
+      
       const data = await response.json();
   
       // AI message from API response
@@ -100,7 +100,7 @@ const Index = () => {
       
       // Format and add messages
       messages.forEach((msg, index) => {
-        const role = msg.role === 'user' ? 'You' : 'Donatuz AI';
+        const role = msg.role === 'user' ? 'You' : ' AI';
         const time = msg.timestamp ? new Date(msg.timestamp).toLocaleString() : '';
         
         // Add the role and timestamp
@@ -181,11 +181,9 @@ const Index = () => {
                 </div>
               </div>
             )}
-            
             <div ref={messagesEndRef} />
           </div>
         </div>
-        
         <div className="sticky bottom-0 w-full glass-panel rounded-t-2xl px-4 py-4 border-t bg-background/80 backdrop-blur-sm">
           <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
         </div>
